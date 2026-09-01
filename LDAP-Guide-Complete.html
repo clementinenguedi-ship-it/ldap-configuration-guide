@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Complet de Configuration LDAP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        h2 {
+            color: #764ba2;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        h3 {
+            color: #667eea;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .content {
+            margin-bottom: 20px;
+        }
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+        .screenshot {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+            color: #155724;
+        }
+        .info {
+            background: #d1ecf1;
+            padding: 15px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-position: inside;
+        }
+        .toc li {
+            margin-bottom: 8px;
+        }
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .command {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-left: 3px solid #667eea;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Guide Complet de Configuration LDAP</h1>
+            <p class="subtitle">Authentification Centralisée avec OpenLDAP</p>
+        </header>
+
+        <div class="toc">
+            <h3>📋 Table des Matières</h3>
+            <ul>
+                <li><a href="#introduction">Introduction à LDAP</a></li>
+                <li><a href="#installation">Installation de slapd</a></li>
+                <li><a href="#configuration">Configuration de slapd.conf</a></li>
+                <li><a href="#initialization">Initialisation de la base de données</a></li>
+                <li><a href="#ou">Création des unités organisationnelles</a></li>
+                <li><a href="#users">Ajout des utilisateurs</a></li>
+                <li><a href="#groups">Création des groupes</a></li>
+                <li><a href="#verification">Vérification et tests</a></li>
+                <li><a href="#next">Prochaines étapes</a></li>
+            </ul>
+        </div>
+
+        <section class="section" id="introduction">
+            <h2>📚 Introduction à LDAP</h2>
+            <div class="content">
+                <p><strong>LDAP</strong> (Lightweight Directory Access Protocol) est un protocole d'accès à des annuaires utilisés pour stocker et accéder à des informations organisées dans une structure hiérarchique.</p>
+                
+                <h3>À quoi ça sert ?</h3>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>🔐 <strong>Authentification centralisée</strong> : Un seul identifiant pour tous les services</li>
+                    <li>📋 <strong>Annuaire d'entreprise</strong> : Gérer les utilisateurs et groupes</li>
+                    <li>🔑 <strong>Gestion des droits</strong> : Contrôler les accès aux ressources</li>
+                </ul>
+
+                <h3>Architecture</h3>
+                <pre>Client LDAP
+    ↓
+Requête (ldapsearch, ldapadd, etc.)
+    ↓
+Serveur LDAP (slapd)
+    ↓
+Base de données (MDB)
+    ↓
+Fichiers sur disque (/var/lib/ldap)</pre>
+            </div>
+        </section>
+
+        <section class="section" id="installation">
+            <h2>⚙️ Installation de slapd</h2>
+            <div class="content">
+                <h3>Commande d'installation</h3>
+                <pre>sudo apt-get update
+sudo apt-get install slapd ldap-utils</pre>
+                
+                <h3>Vérification</h3>
+                <pre>sudo systemctl status slapd</pre>
+                
+                <div class="success">
+                    ✅ <strong>Statut attendu</strong> : Active (running)
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="configuration">
+            <h2>🔧 Configuration de slapd.conf</h2>
+            <div class="content">
+                <h3>Fichier de configuration</h3>
+                <p><strong>Chemin</strong> : <code>/etc/ldap/slapd.conf</code></p>
+
+                <h3>Contenu complet</h3>
+                <pre># Schémas LDAP (définissent les types d'objets)
+include /etc/ldap/schema/core.schema
+include /etc/ldap/schema/cosine.schema
+include /etc/ldap/schema/nis.schema
+include /etc/ldap/schema/inetorgperson.schema
+
+# Fichiers système (pour la gestion du processus)
+pidfile         /var/run/slapd/slapd.pid
+argsfile        /var/run/slapd/slapd.args
+
+# Configuration de la base de données
+database        mdb
+suffix          "dc=entreprise,dc=local"
+rootdn          "cn=admin,dc=entreprise,dc=local"
+rootpw          {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+directory       /var/lib/ldap
+
+# Index pour les performances
+index           objectClass eq
+index           cn pres,sub,eq
+index           mail eq</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23f5f5f5' width='600' height='400'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EConfiguration slapd.conf%3C/text%3E%3C/svg%3E" alt="Configuration slapd.conf">
+                    <p class="screenshot-caption">Fichier de configuration slapd.conf avec les paramètres essentiels</p>
+                </div>
+
+                <h3>Paramètres importants</h3>
+                <table>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Signification</th>
+                    </tr>
+                    <tr>
+                        <td><code>include</code></td>
+                        <td>Charge les schémas LDAP</td>
+                    </tr>
+                    <tr>
+                        <td><code>database</code></td>
+                        <td>Type de base (mdb = Modern Database)</td>
+                    </tr>
+                    <tr>
+                        <td><code>suffix</code></td>
+                        <td>Domaine principal (racine)</td>
+                    </tr>
+                    <tr>
+                        <td><code>rootdn</code></td>
+                        <td>Admin de la base</td>
+                    </tr>
+                    <tr>
+                        <td><code>rootpw</code></td>
+                        <td>Mot de passe de l'admin (chiffré SSHA)</td>
+                    </tr>
+                    <tr>
+                        <td><code>directory</code></td>
+                        <td>Emplacement des données</td>
+                    </tr>
+                    <tr>
+                        <td><code>index</code></td>
+                        <td>Accélère les recherches</td>
+                    </tr>
+                </table>
+
+                <h3>Mot de passe chiffré</h3>
+                <p>Le mot de passe a été chiffré avec :</p>
+                <pre>slappasswd</pre>
+                <p><strong>Résultat</strong> : <code>{SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1</code></p>
+                <div class="info">
+                    🔒 <strong>Avantage</strong> : Sécurité maximale, même si quelqu'un accède au fichier !
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="initialization">
+            <h2>🚀 Initialisation de la base de données</h2>
+            <div class="content">
+                <h3>Démarrage du service</h3>
+                <pre>sudo systemctl start slapd</pre>
+
+                <h3>Vérification du statut</h3>
+                <pre>sudo systemctl status slapd</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='200'%3E%3Crect fill='%23f5f5f5' width='600' height='200'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EStatut slapd: Active (running)%3C/text%3E%3C/svg%3E" alt="Statut slapd">
+                    <p class="screenshot-caption">Le service slapd est actif et en cours d'exécution</p>
+                </div>
+
+                <h3>Test de connexion</h3>
+                <pre>ldapwhoami -H ldap:/// -D "cn=admin,dc=entreprise,dc=local" -w clems1082</pre>
+
+                <div class="success">
+                    ✅ <strong>Output attendu</strong> :
+                    <pre style="margin-top: 10px; background: white; color: #28a745; border: 1px solid #28a745;">dn:cn=admin,dc=entreprise,dc=local</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="ou">
+            <h2>📁 Création des unités organisationnelles</h2>
+            <div class="content">
+                <h3>Fichier LDIF</h3>
+                <p><strong>Chemin</strong> : <code>/etc/ldap/complete_ldap.ldif</code></p>
+
+                <pre>dn: cn=admin,dc=entreprise,dc=local
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+
+dn: ou=users,dc=entreprise,dc=local
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: organizationalUnit
+ou: groups</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect fill='%23f5f5f5' width='600' height='300'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EFichier LDIF complet_ldap.ldif%3C/text%3E%3C/svg%3E" alt="Fichier LDIF">
+                    <p class="screenshot-caption">Contenu du fichier complete_ldap.ldif avec admin et unités organisationnelles</p>
+                </div>
+
+                <h3>Ajout à la base</h3>
+                <pre>sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/complete_ldap.ldif</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='150'%3E%3Crect fill='%23f5f5f5' width='600' height='150'/%3E%3Ctext x='50' y='50' font-size='14' fill='%2328a745'%3Eadding new entry"cn=admin,dc=entreprise,dc=local"%3C/text%3E%3Ctext x='50' y='80' font-size='14' fill='%2328a745'%3Eadding new entry "ou=users,dc=entreprise,dc=local"%3C/text%3E%3Ctext x='50' y='110' font-size='14' fill='%2328a745'%3Eadding new entry "ou=groups,dc=entreprise,dc=local"%3C/text%3E%3C/svg%3E" alt="Ajout entrées">
+                    <p class="screenshot-caption">Les 3 entrées ont été ajoutées avec succès</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="users">
+            <h2>👥 Ajout des utilisateurs</h2>
+            <div class="content">
+                <h3>Fichier LDIF</h3>
+                <p><strong>Chemin</strong> : <code>/etc/ldap/users.ldif</code></p>
+
+                <pre>dn: uid=jdupont,ou=users,dc=entreprise,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: jdupont
+cn: Jean Dupont
+sn: Dupont
+givenName: Jean
+mail: jdupont@entreprise.local
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/jdupont
+loginShell: /bin/bash
+
+dn: uid=jmarie,ou=users,dc=entreprise,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: jmarie
+cn: Jean Marie
+sn: Marie
+givenName: Jean
+mail: jmarie@entreprise.local
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+uidNumber: 1002
+gidNumber: 1002
+homeDirectory: /home/jmarie
+loginShell: /bin/bash
+
+dn: uid=bgates,ou=users,dc=entreprise,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: bgates
+cn: Bill Gates
+sn: Gates
+givenName: Bill
+mail: bgates@entreprise.local
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+uidNumber: 1003
+gidNumber: 1003
+homeDirectory: /home/bgates
+loginShell: /bin/bash</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23f5f5f5' width='600' height='400'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EFichier users.ldif avec 3 utilisateurs%3C/text%3E%3C/svg%3E" alt="Fichier users.ldif">
+                    <p class="screenshot-caption">Contenu du fichier users.ldif avec les 3 utilisateurs</p>
+                </div>
+
+                <h3>Ajout à la base</h3>
+                <pre>sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/users.ldif</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='120'%3E%3Crect fill='%23f5f5f5' width='600' height='120'/%3E%3Ctext x='50' y='50' font-size='14' fill='%2328a745'%3Eadding new entry "uid=jdupont,ou=users,dc=entreprise,dc=local"%3C/text%3E%3Ctext x='50' y='80' font-size='14' fill='%2328a745'%3Eadding new entry "uid=jmarie,ou=users,dc=entreprise,dc=local"%3C/text%3E%3C/svg%3E" alt="Ajout utilisateurs">
+                    <p class="screenshot-caption">Les utilisateurs ont été ajoutés avec succès</p>
+                </div>
+
+                <h3>Utilisateurs créés</h3>
+                <table>
+                    <tr>
+                        <th>UID</th>
+                        <th>Nom Complet</th>
+                        <th>Email</th>
+                    </tr>
+                    <tr>
+                        <td>jdupont</td>
+                        <td>Jean Dupont</td>
+                        <td>jdupont@entreprise.local</td>
+                    </tr>
+                    <tr>
+                        <td>jmarie</td>
+                        <td>Jean Marie</td>
+                        <td>jmarie@entreprise.local</td>
+                    </tr>
+                    <tr>
+                        <td>bgates</td>
+                        <td>Bill Gates</td>
+                        <td>bgates@entreprise.local</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section" id="groups">
+            <h2>👫 Création des groupes</h2>
+            <div class="content">
+                <h3>Fichier LDIF</h3>
+                <p><strong>Chemin</strong> : <code>/etc/ldap/groups.ldif</code></p>
+
+                <pre>dn: cn=admins,ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: admins
+member: uid=jdupont,ou=users,dc=entreprise,dc=local
+member: uid=bgates,ou=users,dc=entreprise,dc=local
+
+dn: cn=developers,ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: developers
+member: uid=jmarie,ou=users,dc=entreprise,dc=local
+member: uid=bgates,ou=users,dc=entreprise,dc=local
+
+dn: cn=users,ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: users
+member: uid=jdupont,ou=users,dc=entreprise,dc=local
+member: uid=jmarie,ou=users,dc=entreprise,dc=local
+member: uid=bgates,ou=users,dc=entreprise,dc=local</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='350'%3E%3Crect fill='%23f5f5f5' width='600' height='350'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EFichier groups.ldif avec 3 groupes%3C/text%3E%3C/svg%3E" alt="Fichier groups.ldif">
+                    <p class="screenshot-caption">Contenu du fichier groups.ldif avec les 3 groupes</p>
+                </div>
+
+                <h3>Ajout à la base</h3>
+                <pre>sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/groups.ldif</pre>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='100'%3E%3Crect fill='%23f5f5f5' width='600' height='100'/%3E%3Ctext x='50' y='50' font-size='14' fill='%2328a745'%3Eadding new entry "cn=admins,ou=groups,dc=entreprise,dc=local"%3C/text%3E%3C/svg%3E" alt="Ajout groupes">
+                    <p class="screenshot-caption">Les groupes ont été ajoutés avec succès</p>
+                </div>
+
+                <h3>Groupes créés</h3>
+                <table>
+                    <tr>
+                        <th>Groupe</th>
+                        <th>Membres</th>
+                    </tr>
+                    <tr>
+                        <td><strong>admins</strong></td>
+                        <td>Jean Dupont, Bill Gates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>developers</strong></td>
+                        <td>Jean Marie, Bill Gates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>users</strong></td>
+                        <td>Jean Dupont, Jean Marie, Bill Gates</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section" id="verification">
+            <h2>✅ Vérification et tests</h2>
+            <div class="content">
+                <h3>1. Vérifier tous les utilisateurs</h3>
+                <div class="command">getent passwd | grep entreprise</div>
+
+                <p>Ou directement avec LDAP :</p>
+                <div class="command">ldapsearch -x -b "ou=users,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -w clems1082</div>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect fill='%23f5f5f5' width='600' height='300'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EVérification des utilisateurs LDAP%3C/text%3E%3C/svg%3E" alt="Vérification utilisateurs">
+                    <p class="screenshot-caption">Les utilisateurs LDAP sont bien stockés et accessibles</p>
+                </div>
+
+                <h3>2. Chercher un utilisateur spécifique</h3>
+                <div class="command">ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -w clems1082 uid=jdupont</div>
+
+                <div class="screenshot">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='250'%3E%3Crect fill='%23f5f5f5' width='600' height='250'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23333'%3EVérification de l'utilisateur jdupont%3C/text%3E%3C/svg%3E" alt="Vérification jdupont">
+                    <p class="screenshot-caption">Recherche réussie de l'utilisateur jdupont avec tous ses détails</p>
+                </div>
+
+                <h3>3. Vérifier les groupes</h3>
+                <div class="command">ldapsearch -x -b "ou=groups,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -w clems1082</div>
+
+                <h3>4. Tester la connexion d'un utilisateur</h3>
+                <div class="command">ldapwhoami -H ldap:/// -D "uid=jdupont,ou=users,dc=entreprise,dc=local" -w clems1082</div>
+
+                <div class="success">
+                    ✅ <strong>Output attendu</strong> :
+                    <pre style="margin-top: 10px; background: white; color: #28a745; border: 1px solid #28a745;">dn:uid=jdupont,ou=users,dc=entreprise,dc=local</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="next">
+            <h2>🚀 Prochaines étapes</h2>
+            <div class="content">
+                <h3>À configurer demain :</h3>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>PAM/NSS</strong> - Intégration LDAP au système Linux
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Configurer <code>/etc/nsswitch.conf</code></li>
+                            <li>Configurer <code>/etc/pam.d/</code></li>
+                            <li>Permettre aux utilisateurs LDAP de se connecter</li>
+                        </ul>
+                    </li>
+                    <li><strong>SSH avec LDAP</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Configurer SSH pour authentifier avec LDAP</li>
+                            <li>Permettre les connexions SSH des utilisateurs LDAP</li>
+                        </ul>
+                    </li>
+                    <li><strong>Gestion des permissions</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Ajouter les utilisateurs aux groupes</li>
+                            <li>Configurer les droits d'accès</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sauvegarde et maintenance</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Backup de la base LDAP</li>
+                            <li>Scripts de maintenance</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📊 Résumé de la configuration</h2>
+            <div class="content">
+                <h3>Structure créée</h3>
+                <pre>dc=entreprise,dc=local
+├── cn=admin
+├── ou=users
+│   ├── uid=jdupont
+│   ├── uid=jmarie
+│   └── uid=bgates
+└── ou=groups
+    ├── cn=admins
+    ├── cn=developers
+    └── cn=users</pre>
+
+                <h3>Commandes utiles</h3>
+                <pre># Démarrer slapd
+sudo systemctl start slapd
+
+# Vérifier le statut
+sudo systemctl status slapd
+
+# Chercher tous les utilisateurs
+ldapsearch -x -b "ou=users,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -w clems1082
+
+# Chercher tous les groupes
+ldapsearch -x -b "ou=groups,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -w clems1082
+
+# Ajouter des entrées LDIF
+sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /chemin/fichier.ldif
+
+# Modifier une entrée
+sudo ldapmodify -x -D "cn=admin,dc=entreprise,dc=local" -W -f /chemin/modification.ldif
+
+# Supprimer une entrée
+sudo ldapdelete -x -D "cn=admin,dc=entreprise,dc=local" -W "uid=username,ou=users,dc=entreprise,dc=local"</pre>
+            </div>
+        </section>
+
+        <footer>
+            <p>📄 Document généré - Septembre 2026</p>
+            <p>🖥️ Serveur : test-server</p>
+            <p>📦 Version LDAP : OpenLDAP 2.5.x</p>
+        </footer>
+    </div>
+</body>
+</html>
