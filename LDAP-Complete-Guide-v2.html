@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Complet Configuration LDAP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 30px;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .meta-info {
+            color: #999;
+            font-size: 0.95em;
+            margin-top: 15px;
+        }
+        
+        h2 {
+            color: #764ba2;
+            font-size: 2em;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            color: #667eea;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            page-break-after: avoid;
+        }
+        
+        h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            page-break-inside: avoid;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-weight: bold;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            border-left: 4px solid #667eea;
+            page-break-inside: avoid;
+        }
+        
+        .command-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            cursor: copy;
+        }
+        
+        .command-box:hover {
+            background: #e8ecff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px 15px;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        tr:hover {
+            background: #f0f4ff;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 20px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            padding: 20px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+            color: #0c5460;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .success {
+            background: #d4edda;
+            padding: 20px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+            color: #155724;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .danger {
+            background: #f8d7da;
+            padding: 20px;
+            border-left: 4px solid #dc3545;
+            margin: 20px 0;
+            color: #721c24;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .toc {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 8px;
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .toc h3 {
+            color: #667eea;
+            margin-top: 0;
+            border: none;
+        }
+        
+        .toc ul {
+            list-style: none;
+            margin: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .toc li:before {
+            content: "📖";
+            position: absolute;
+            left: 0;
+        }
+        
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .toc a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .architecture {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border-left: 4px solid #667eea;
+        }
+        
+        footer {
+            margin-top: 80px;
+            padding-top: 30px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .back-to-top {
+            display: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            font-size: 20px;
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+        }
+        
+        .explanation {
+            background: #f9f9f9;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        
+        .explanation strong {
+            color: #764ba2;
+        }
+        
+        .password-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-left: 4px solid #ff6b6b;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            page-break-inside: avoid;
+        }
+        
+        .structure-tree {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            line-height: 1.8;
+            border-left: 4px solid #667eea;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .back-to-top {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Guide Complet de Configuration LDAP</h1>
+            <p class="subtitle">Authentification Centralisée avec OpenLDAP - Documentation Détaillée</p>
+            <div class="meta-info">
+                <p>📅 Date : Septembre 2026</p>
+                <p>🖥️ Serveur : test-server (Ubuntu/Debian)</p>
+                <p>📦 Version LDAP : OpenLDAP 2.5.x</p>
+                <p>🗄️ Base de données : MDB (Modern Database)</p>
+            </div>
+        </header>
+
+        <div class="toc">
+            <h3>📋 Table des Matières</h3>
+            <ul>
+                <li><a href="#introduction">Introduction à LDAP</a></li>
+                <li><a href="#installation">Installation de slapd</a></li>
+                <li><a href="#configuration">Configuration de slapd.conf</a></li>
+                <li><a href="#initialisation">Initialisation de la base de données</a></li>
+                <li><a href="#ou">Création des unités organisationnelles</a></li>
+                <li><a href="#users">Ajout des utilisateurs</a></li>
+                <li><a href="#groups">Création des groupes</a></li>
+                <li><a href="#verification">Vérification et tests</a></li>
+                <li><a href="#problemes">Problèmes et solutions</a></li>
+                <li><a href="#resume">Résumé et commandes utiles</a></li>
+            </ul>
+        </div>
+
+        <section class="section" id="introduction">
+            <h2>📚 Introduction à LDAP</h2>
+            
+            <h3>Qu'est-ce que LDAP ?</h3>
+            <p><strong>LDAP</strong> (Lightweight Directory Access Protocol) est un protocole standardisé pour accéder et maintenir des services d'annuaire distribués sur un réseau IP.</p>
+            <p>C'est comme une <strong>base de données hiérarchique</strong> qui stocke les informations d'utilisateurs, de groupes et de ressources.</p>
+            
+            <h3>À quoi ça sert ?</h3>
+            <ul>
+                <li>🔐 <strong>Authentification centralisée</strong> : Un seul identifiant (username) pour accéder à tous les services (email, SSH, applications)</li>
+                <li>📋 <strong>Annuaire d'entreprise</strong> : Gestion centralisée des utilisateurs et groupes</li>
+                <li>🔑 <strong>Contrôle d'accès</strong> : Vérifier qui a le droit d'accéder à quoi</li>
+                <li>🌐 <strong>Intégration système</strong> : Connecter Linux, Windows, applications avec un annuaire commun</li>
+            </ul>
+            
+            <h3>Architecture LDAP</h3>
+            <div class="architecture">┌──────────────────────────────┐
+│  Client LDAP                 │  (ldapsearch, ldapadd, ldapmodify)
+└──────────────┬───────────────┘
+               │
+               │ Requête LDAP (port 389)
+               │
+┌──────────────▼─────────────────────────┐
+│  Serveur LDAP                          │  (slapd = Standalone LDAP Daemon)
+│   (slapd)                              │
+└──────────────┬─────────────────────────┘
+               │
+               │
+┌──────────────▼──────────────────────────┐
+│ Base de données MDB                    │  (Modern Database)
+│ (/var/lib/ldap/)                       │
+└────────────────────────────────────────┘
+            </div>
+            
+            <h3>Structure hiérarchique DIT (Directory Information Tree)</h3>
+            <p>LDAP organise les données en <strong>arborescence</strong> :</p>
+            <div class="structure-tree">dc=entreprise,dc=local (racine)
+├── cn=admin (administrateur)
+├── ou=users (unité organisationnelle = dossier)
+│   ├── uid=jdupont (utilisateur)
+│   ├── uid=jmarie
+│   └── uid=bgates
+└── ou=groups
+    ├── cn=admins (groupe)
+    ├── cn=developers
+    └── cn=users
+            </div>
+            
+            <h3>Composants clés</h3>
+            <ul>
+                <li><strong>DN (Distinguished Name)</strong> : Adresse unique d'une entrée (ex: <code>uid=jdupont,ou=users,dc=entreprise,dc=local</code>)</li>
+                <li><strong>RDN (Relative Distinguished Name)</strong> : Partie locale du DN (ex: <code>uid=jdupont</code>)</li>
+                <li><strong>Suffix</strong> : La racine du répertoire (ex: <code>dc=entreprise,dc=local</code>)</li>
+                <li><strong>ObjectClass</strong> : Type d'objet LDAP (inetOrgPerson, posixAccount, groupOfNames)</li>
+            </ul>
+        </section>
+
+        <section class="section" id="installation">
+            <h2>⚙️ Installation de slapd</h2>
+            
+            <h3>Étape 1 : Mise à jour des paquets</h3>
+            <div class="command-box">sudo apt-get update</div>
+            <div class="explanation">
+                <strong>Explication :</strong> Cette commande met à jour la liste des paquets disponibles auprès des serveurs de paquets Ubuntu/Debian. C'est <strong>obligatoire</strong> avant toute installation.
+                <br><br>
+                <strong>Pourquoi ?</strong> Sans cette mise à jour, vous risquez d'installer des versions obsolètes ou d'avoir des erreurs de dépendances.
+            </div>
+            
+            <h3>Étape 2 : Installation des paquets LDAP</h3>
+            <div class="command-box">sudo apt-get install slapd ldap-utils</div>
+            <div class="explanation">
+                <strong>Explication :</strong>
+                <ul>
+                    <li><code>slapd</code> : Le serveur LDAP (Standalone LDAP Daemon)</li>
+                    <li><code>ldap-utils</code> : Les outils clients pour interroger et gérer LDAP (ldapsearch, ldapadd, ldapmodify, etc.)</li>
+                </ul>
+                <strong>Important :</strong> Pendant l'installation, le système vous demandera le mot de passe administrateur LDAP. Notez ce mot de passe !
+            </div>
+            
+            <h3>Étape 3 : Vérification de l'installation</h3>
+            <div class="command-box">sudo systemctl status slapd</div>
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                ⚫ slapd.service - LSB: OpenLDAP server<br>
+                Loaded: loaded (/etc/init.d/slapd; generated)<br>
+                <strong>Active: active (running)</strong> since Mon 2026-08-31 19:54:48 UTC; 3h 30min ago
+            </div>
+            
+            <h3>Problèmes rencontrés et solutions</h3>
+            
+            <h4>❌ Problème 1 : "Package slapd not found"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> Les paquets ne sont pas à jour ou le repository ne contient pas slapd.
+                <br><br>
+                <strong>Solution :</strong>
+            </div>
+            <pre>sudo apt-get update
+sudo apt-cache search slapd
+sudo apt-get install slapd ldap-utils</pre>
+            
+            <h4>❌ Problème 2 : "slapd service is not running"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> Le service n'a pas démarré automatiquement.
+                <br><br>
+                <strong>Solution :</strong>
+            </div>
+            <pre># Démarrer manuellement
+sudo systemctl start slapd
+
+# Activer au démarrage
+sudo systemctl enable slapd
+
+# Vérifier
+sudo systemctl status slapd</pre>
+        </section>
+
+        <section class="section" id="configuration">
+            <h2>🔧 Configuration de slapd.conf</h2>
+            
+            <h3>Localisation du fichier</h3>
+            <p><strong>Chemin :</strong> <code>/etc/ldap/slapd.conf</code></p>
+            <p>C'est le <strong>fichier principal de configuration</strong> du serveur LDAP.</p>
+            
+            <h3>Contenu complet expliqué</h3>
+            
+            <pre># =============================================================================
+# SECTION 1 : SCHÉMAS LDAP
+# =============================================================================
+# Les schémas définissent les types d'objets autorisés et leurs attributs
+
+include /etc/ldap/schema/core.schema
+# Core schema : attributs et objectClass de base (cn, uid, mail, etc.)
+
+include /etc/ldap/schema/cosine.schema
+# COSINE schema : attributs pour les standards de communication
+
+include /etc/ldap/schema/nis.schema
+# NIS schema : attributs pour les systèmes Unix (uidNumber, gidNumber, etc.)
+
+include /etc/ldap/schema/inetorgperson.schema
+# InetOrgPerson schema : attributs pour les personnes (givenName, sn, mail, etc.)
+
+# =============================================================================
+# SECTION 2 : FICHIERS SYSTÈME
+# =============================================================================
+
+pidfile         /var/run/slapd/slapd.pid
+# Fichier PID : identifiant du processus slapd
+
+argsfile        /var/run/slapd/slapd.args
+# Fichier d'arguments : enregistre les paramètres de démarrage
+
+# =============================================================================
+# SECTION 3 : BASE DE DONNÉES
+# =============================================================================
+
+database        mdb
+# Type de base de données : MDB = très performant, supporte ACID
+
+suffix          "dc=entreprise,dc=local"
+# Suffix : racine de l'arborescence LDAP
+# Le suffixe définit le DN de base pour TOUT dans cet annuaire
+
+rootdn          "cn=admin,dc=entreprise,dc=local"
+# rootdn : Distinguished Name de l'administrateur LDAP
+# C'est l'utilisateur avec les droits maximum
+
+rootpw          {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+# rootpw : Mot de passe chiffré de l'admin
+# Format : {SSHA}= SSHA signifie Salted SHA
+# Mot de passe en CLAIR : clems1082
+
+directory       /var/lib/ldap
+# directory : Chemin où sont stockés les fichiers de la base LDAP
+
+# =============================================================================
+# SECTION 4 : OPTIMISATION - INDEX
+# =============================================================================
+
+index           objectClass eq
+# Index sur objectClass pour les recherches exactes
+
+index           cn pres,sub,eq
+# Index sur cn (common name)
+
+index           mail eq
+# Index sur mail pour recherches exactes</pre>
+            
+            <h3>Tableau des paramètres</h3>
+            <table>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                    <th>Explication</th>
+                </tr>
+                <tr>
+                    <td><code>database</code></td>
+                    <td>mdb</td>
+                    <td>Type de base de données très performante et fiable</td>
+                </tr>
+                <tr>
+                    <td><code>suffix</code></td>
+                    <td>dc=entreprise,dc=local</td>
+                    <td>Racine de l'annuaire (ex: domaine)</td>
+                </tr>
+                <tr>
+                    <td><code>rootdn</code></td>
+                    <td>cn=admin,...</td>
+                    <td>Admin avec tous les droits</td>
+                </tr>
+                <tr>
+                    <td><code>rootpw</code></td>
+                    <td>{SSHA}...</td>
+                    <td>Mot de passe de l'admin chiffré</td>
+                </tr>
+                <tr>
+                    <td><code>directory</code></td>
+                    <td>/var/lib/ldap</td>
+                    <td>Lieu de stockage des données</td>
+                </tr>
+                <tr>
+                    <td><code>index</code></td>
+                    <td>objectClass eq</td>
+                    <td>Accélère les recherches</td>
+                </tr>
+            </table>
+            
+            <h3>Comment générer le mot de passe SSHA</h3>
+            <div class="command-box">slappasswd -s clems1082</div>
+            <div class="explanation">
+                <strong>Explication :</strong>
+                <ul>
+                    <li><code>-s clems1082</code> : spécifie le mot de passe en clair</li>
+                    <li>La commande génère un hash SSHA avec un salt (graine aléatoire) pour plus de sécurité</li>
+                </ul>
+            </div>
+            
+            <div class="password-box">
+                <strong>🔒 Mot de passe en clair :</strong> <code>clems1082</code><br>
+                <strong>🔐 Mot de passe SSHA :</strong> <code>{SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1</code><br><br>
+                <strong>Avantage du SSHA :</strong>
+                <ul style="margin-top: 10px;">
+                    <li>✅ Impossible de retrouver le mot de passe en clair même si quelqu'un vole le fichier</li>
+                    <li>✅ Salt aléatoire : deux exécutions du même mot de passe donnent des hashes différents</li>
+                    <li>✅ Sécurité cryptographique forte</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section" id="initialisation">
+            <h2>🚀 Initialisation de la base de données</h2>
+            
+            <h3>Étape 1 : Démarrage du service</h3>
+            <div class="command-box">sudo systemctl start slapd</div>
+            <div class="explanation">
+                <strong>Explication :</strong> Lance le service LDAP. Cela crée automatiquement :
+                <ul>
+                    <li>La structure de base de données</li>
+                    <li>Le répertoire <code>/var/lib/ldap</code> si nécessaire</li>
+                    <li>Le suffixe <code>dc=entreprise,dc=local</code></li>
+                    <li>L'administrateur <code>cn=admin,dc=entreprise,dc=local</code></li>
+                </ul>
+            </div>
+            
+            <h3>Étape 2 : Test de connexion à LDAP</h3>
+            <div class="command-box">ldapwhoami -H ldap:/// -D "cn=admin,dc=entreprise,dc=local" -w clems1082</div>
+            <div class="explanation">
+                <strong>Explication détaillée :</strong>
+                <ul>
+                    <li><code>ldapwhoami</code> : commande qui vérifie l'authentification LDAP</li>
+                    <li><code>-H ldap:///</code> : URI du serveur LDAP (localhost par défaut)</li>
+                    <li><code>-D "cn=admin,dc=entreprise,dc=local"</code> : DN de l'utilisateur (ici l'admin)</li>
+                    <li><code>-w clems1082</code> : mot de passe en clair (utile pour tester)</li>
+                </ul>
+            </div>
+            
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                <code>dn:cn=admin,dc=entreprise,dc=local</code><br><br>
+                Cela signifie : Vous êtes authentifié en tant qu'admin, la connexion LDAP fonctionne !
+            </div>
+            
+            <h3>Problèmes rencontrés et solutions</h3>
+            
+            <h4>❌ Problème 1 : "Can't contact LDAP server"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> Le service slapd n'est pas démarré ou écoute sur un autre port.
+            </div>
+            <pre>sudo systemctl status slapd
+sudo systemctl start slapd
+sudo tail -f /var/log/syslog | grep slapd</pre>
+            
+            <h4>❌ Problème 2 : "Invalid Credentials"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> Mot de passe admin incorrect.<br>
+                <strong>Solution :</strong> Vérifier que le mot de passe est <code>clems1082</code>
+            </div>
+        </section>
+
+        <section class="section" id="ou">
+            <h2>📁 Création des unités organisationnelles</h2>
+            
+            <h3>Qu'est-ce qu'une unité organisationnelle (OU) ?</h3>
+            <p>Une OU est un <strong>conteneur</strong> dans LDAP, comme un dossier. Elle permet d'organiser les entrées :</p>
+            <ul>
+                <li><code>ou=users</code> : contiendra tous les utilisateurs</li>
+                <li><code>ou=groups</code> : contiendra tous les groupes</li>
+                <li><code>ou=services</code> : contiendra les services applicatifs</li>
+            </ul>
+            
+            <h3>Fichier LDIF (LDAP Data Interchange Format)</h3>
+            <p><strong>Chemin :</strong> <code>/etc/ldap/complete_ldap.ldif</code></p>
+            
+            <pre>dn: cn=admin,dc=entreprise,dc=local
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+
+dn: ou=users,dc=entreprise,dc=local
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: organizationalUnit
+ou: groups</pre>
+            
+            <h3>Ajout à la base LDAP</h3>
+            <div class="command-box">sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/complete_ldap.ldif</div>
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                adding new entry "cn=admin,dc=entreprise,dc=local"<br>
+                adding new entry "ou=users,dc=entreprise,dc=local"<br>
+                adding new entry "ou=groups,dc=entreprise,dc=local"
+            </div>
+        </section>
+
+        <section class="section" id="users">
+            <h2>👥 Ajout des utilisateurs</h2>
+            
+            <h3>Structure d'un utilisateur LDAP</h3>
+            <p>Un utilisateur LDAP doit avoir :</p>
+            <ul>
+                <li><strong>inetOrgPerson</strong> : permet d'avoir les infos de personne (nom, prénom, email)</li>
+                <li><strong>posixAccount</strong> : permet d'avoir les infos Unix (UID, GID, shell, home)</li>
+            </ul>
+            
+            <h3>Fichier LDIF des utilisateurs</h3>
+            <p><strong>Chemin :</strong> <code>/etc/ldap/users.ldif</code></p>
+            
+            <pre>dn: uid=jdupont,ou=users,dc=entreprise,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: jdupont
+cn: Jean Dupont
+sn: Dupont
+givenName: Jean
+mail: jdupont@entreprise.local
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/jdupont
+loginShell: /bin/bash
+
+dn: uid=jmarie,ou=users,dc=entreprise,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: jmarie
+cn: Jean Marie
+sn: Marie
+givenName: Jean
+mail: jmarie@entreprise.local
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+uidNumber: 1002
+gidNumber: 1002
+homeDirectory: /home/jmarie
+loginShell: /bin/bash
+
+dn: uid=bgates,ou=users,dc=entreprise,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: bgates
+cn: Bill Gates
+sn: Gates
+givenName: Bill
+mail: bgates@entreprise.local
+userPassword: {SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1
+uidNumber: 1003
+gidNumber: 1003
+homeDirectory: /home/bgates
+loginShell: /bin/bash</pre>
+            
+            <h3>Tableau des attributs</h3>
+            <table>
+                <tr>
+                    <th>Attribut</th>
+                    <th>Exemple</th>
+                    <th>Explication</th>
+                </tr>
+                <tr>
+                    <td><code>uid</code></td>
+                    <td>jdupont</td>
+                    <td>Identifiant utilisateur (login)</td>
+                </tr>
+                <tr>
+                    <td><code>cn</code></td>
+                    <td>Jean Dupont</td>
+                    <td>Nom complet (Common Name)</td>
+                </tr>
+                <tr>
+                    <td><code>mail</code></td>
+                    <td>jdupont@entreprise.local</td>
+                    <td>Adresse email</td>
+                </tr>
+                <tr>
+                    <td><code>userPassword</code></td>
+                    <td>{SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1</td>
+                    <td>Mot de passe chiffré</td>
+                </tr>
+                <tr>
+                    <td><code>uidNumber</code></td>
+                    <td>1001</td>
+                    <td>ID numérique Unix unique</td>
+                </tr>
+                <tr>
+                    <td><code>homeDirectory</code></td>
+                    <td>/home/jdupont</td>
+                    <td>Répertoire home</td>
+                </tr>
+                <tr>
+                    <td><code>loginShell</code></td>
+                    <td>/bin/bash</td>
+                    <td>Shell de connexion</td>
+                </tr>
+            </table>
+            
+            <div class="password-box">
+                <strong>🔒 Tous les utilisateurs ont le même mot de passe en clair :</strong> <code>clems1082</code><br>
+                <strong>🔐 Mot de passe SSHA :</strong> <code>{SSHA}RqtLmD0tHJ+1XLRd6JFAuV1iNT00H1</code>
+            </div>
+            
+            <h3>Ajout des utilisateurs</h3>
+            <div class="command-box">sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/users.ldif</div>
+            
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                adding new entry "uid=jdupont,ou=users,dc=entreprise,dc=local"<br>
+                adding new entry "uid=jmarie,ou=users,dc=entreprise,dc=local"<br>
+                adding new entry "uid=bgates,ou=users,dc=entreprise,dc=local"
+            </div>
+        </section>
+
+        <section class="section" id="groups">
+            <h2>👨‍👩‍👦 Création des groupes</h2>
+            
+            <h3>Qu'est-ce qu'un groupe LDAP ?</h3>
+            <p>Un groupe LDAP est un conteneur qui liste les <strong>membres</strong> (utilisateurs ou autres groupes). Utile pour :</p>
+            <ul>
+                <li>Donner les mêmes permissions à plusieurs utilisateurs</li>
+                <li>Organiser les utilisateurs par rôle ou département</li>
+                <li>Contrôler l'accès aux ressources</li>
+            </ul>
+            
+            <h3>Fichier LDIF des groupes</h3>
+            <p><strong>Chemin :</strong> <code>/etc/ldap/groups.ldif</code></p>
+            
+            <pre>dn: cn=admins,ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: admins
+member: uid=jdupont,ou=users,dc=entreprise,dc=local
+member: uid=bgates,ou=users,dc=entreprise,dc=local
+
+dn: cn=developers,ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: developers
+member: uid=jmarie,ou=users,dc=entreprise,dc=local
+member: uid=bgates,ou=users,dc=entreprise,dc=local
+
+dn: cn=users,ou=groups,dc=entreprise,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: users
+member: uid=jdupont,ou=users,dc=entreprise,dc=local
+member: uid=jmarie,ou=users,dc=entreprise,dc=local
+member: uid=bgates,ou=users,dc=entreprise,dc=local</pre>
+            
+            <h3>Composition des groupes</h3>
+            <div class="structure-tree">admins (2 membres)
+├── Jean Dupont (jdupont)
+└── Bill Gates (bgates)
+
+developers (2 membres)
+├── Jean Marie (jmarie)
+└── Bill Gates (bgates)
+
+users (3 membres - TOUS les utilisateurs)
+├── Jean Dupont (jdupont)
+├── Jean Marie (jmarie)
+└── Bill Gates (bgates)
+            </div>
+            
+            <h3>Ajout des groupes</h3>
+            <div class="command-box">sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/groups.ldif</div>
+            
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                adding new entry "cn=admins,ou=groups,dc=entreprise,dc=local"<br>
+                adding new entry "cn=developers,ou=groups,dc=entreprise,dc=local"<br>
+                adding new entry "cn=users,ou=groups,dc=entreprise,dc=local"
+            </div>
+        </section>
+
+        <section class="section" id="verification">
+            <h2>✅ Vérification et tests</h2>
+            
+            <h3>Test 1 : Vérifier tous les utilisateurs</h3>
+            <div class="command-box">ldapsearch -x -b "ou=users,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W</div>
+            <p>Affiche TOUS les utilisateurs avec leurs attributs complets.</p>
+            
+            <h3>Test 2 : Chercher un utilisateur spécifique</h3>
+            <div class="command-box">ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W uid=jdupont</div>
+            
+            <h3>Test 3 : Chercher par email</h3>
+            <div class="command-box">ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W mail=jdupont@entreprise.local</div>
+            
+            <h3>Test 4 : Tester l'authentification d'un utilisateur</h3>
+            <div class="command-box">ldapwhoami -H ldap:/// -D "uid=jdupont,ou=users,dc=entreprise,dc=local" -w clems1082</div>
+            
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                <code>dn:uid=jdupont,ou=users,dc=entreprise,dc=local</code>
+            </div>
+            
+            <h3>Test 5 : Chercher les membres d'un groupe</h3>
+            <div class="command-box">ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W cn=admins | grep member</div>
+            
+            <div class="success">
+                ✅ <strong>Output attendu :</strong><br>
+                member: uid=jdupont,ou=users,dc=entreprise,dc=local<br>
+                member: uid=bgates,ou=users,dc=entreprise,dc=local
+            </div>
+        </section>
+
+        <section class="section" id="problemes">
+            <h2>⚠️ Problèmes rencontrés et solutions</h2>
+            
+            <h3>Problèmes généraux</h3>
+            
+            <h4>❌ Problème : "No such object - search: 2 (Protocol error)"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> Le DN n'existe pas ou la base de recherche est incorrecte.
+            </div>
+            <pre># Vérifier la base de recherche
+ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W -s base
+
+# Lister le contenu
+ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W</pre>
+            
+            <h4>❌ Problème : "Insufficient access rights"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> L'utilisateur n'a pas les droits pour effectuer cette opération.
+            </div>
+            <pre># Utiliser l'admin
+-D "cn=admin,dc=entreprise,dc=local" -w clems1082</pre>
+            
+            <h4>❌ Problème : "Entry already exists"</h4>
+            <div class="danger">
+                <strong>Cause :</strong> L'entrée existe déjà dans LDAP (relancement du même fichier).
+            </div>
+            <pre># Option 1 : Supprimer et réajouter
+sudo ldapdelete -x -D "cn=admin,dc=entreprise,dc=local" -W "ou=users,dc=entreprise,dc=local"
+
+# Option 2 : Modifier au lieu d'ajouter
+sudo ldapmodify -x -D "cn=admin,dc=entreprise,dc=local" -W -f /etc/ldap/complete_ldap.ldif</pre>
+            
+            <h3>Problèmes de performance</h3>
+            
+            <h4>⚠️ Problème : Les recherches sont très lentes</h4>
+            <div class="highlight">
+                <strong>Cause :</strong> Les index ne sont pas configurés.
+            </div>
+            <pre># Ajouter dans slapd.conf :
+index objectClass eq
+index cn pres,sub,eq
+index uid eq
+index mail eq
+
+# Reconstruire les index
+sudo slapindex -f /etc/ldap/slapd.conf
+
+# Redémarrer
+sudo systemctl restart slapd</pre>
+        </section>
+
+        <section class="section" id="resume">
+            <h2>📊 Résumé et commandes utiles</h2>
+            
+            <h3>Structure finale créée</h3>
+            <div class="structure-tree">dc=entreprise,dc=local (racine)
+├── cn=admin (administrateur - motdepasse: clems1082)
+├── ou=users (conteneur utilisateurs)
+│   ├── uid=jdupont (Jean Dupont - motdepasse: clems1082)
+│   ├── uid=jmarie (Jean Marie - motdepasse: clems1082)
+│   └── uid=bgates (Bill Gates - motdepasse: clems1082)
+└── ou=groups (conteneur groupes)
+    ├── cn=admins (jdupont, bgates)
+    ├── cn=developers (jmarie, bgates)
+    └── cn=users (jdupont, jmarie, bgates)
+            </div>
+            
+            <h3>Commandes essentielles</h3>
+            
+            <h4>📌 SERVICE</h4>
+            <pre>sudo systemctl start slapd           # Démarrer slapd
+sudo systemctl stop slapd            # Arrêter slapd
+sudo systemctl restart slapd         # Redémarrer slapd
+sudo systemctl status slapd          # Vérifier le statut
+sudo systemctl enable slapd          # Activer au démarrage</pre>
+            
+            <h4>🔍 RECHERCHE (LDAPSEARCH)</h4>
+            <pre>ldapsearch -x -b "ou=users,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W
+ldapsearch -x -b "dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W uid=jdupont
+ldapsearch -x -b "ou=groups,dc=entreprise,dc=local" -D "cn=admin,dc=entreprise,dc=local" -W</pre>
+            
+            <h4>🔐 AUTHENTIFICATION</h4>
+            <pre>ldapwhoami -H ldap:/// -D "cn=admin,dc=entreprise,dc=local" -w clems1082
+ldapwhoami -H ldap:/// -D "uid=jdupont,ou=users,dc=entreprise,dc=local" -w clems1082</pre>
+            
+            <h4>➕ AJOUT/MODIFICATION/SUPPRESSION</h4>
+            <pre>sudo ldapadd -x -D "cn=admin,dc=entreprise,dc=local" -W -f /chemin/fichier.ldif
+sudo ldapmodify -x -D "cn=admin,dc=entreprise,dc=local" -W -f /chemin/modification.ldif
+sudo ldapdelete -x -D "cn=admin,dc=entreprise,dc=local" -W "uid=jdupont,ou=users,dc=entreprise,dc=local"</pre>
+            
+            <h4>🔑 GÉNÉRATION DE MOT DE PASSE</h4>
+            <pre>slappasswd -s monMotDePasse
+slappasswd  # Mode interactif</pre>
+        </section>
+
+        <section class="section">
+            <h2>🎯 Prochaines étapes</h2>
+            
+            <h3>Phase 2 : Intégration système (PAM/NSS)</h3>
+            <p><strong>Objectif :</strong> Permettre aux utilisateurs LDAP de se connecter à Linux.</p>
+            <ul>
+                <li>Installer <code>libnss-ldap</code> et <code>libpam-ldap</code></li>
+                <li>Configurer <code>/etc/nsswitch.conf</code></li>
+                <li>Configurer <code>/etc/pam.d/common-auth</code></li>
+                <li>Tester la connexion</li>
+            </ul>
+            
+            <h3>Phase 3 : SSH avec LDAP</h3>
+            <p><strong>Objectif :</strong> Utiliser LDAP pour authentifier SSH.</p>
+            
+            <h3>Phase 4 : Sauvegarde et maintenance</h3>
+            <p><strong>Étapes :</strong></p>
+            <ul>
+                <li>Scripts de sauvegarde de la base LDAP</li>
+                <li>Scripts de restauration</li>
+                <li>Monitoring du service</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>📖 <strong>Guide Complet de Configuration LDAP</strong></p>
+            <p>📅 Date : Septembre 2026 | 🖥️ Serveur : test-server | 📦 Version LDAP : OpenLDAP 2.5.x</p>
+            <p>✅ <strong>Authentification :</strong> SSHA | 🔐 <strong>Mot de passe admin :</strong> clems1082</p>
+            <p style="margin-top: 30px; font-size: 0.85em; color: #ccc;">Document généré pour usage éducatif et professionnel | À jour au 05/09/2026</p>
+        </footer>
+    </div>
+    
+    <div class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆️</div>
+    
+    <script>
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+        
+        document.querySelectorAll('.command-box').forEach(box => {
+            box.addEventListener('click', function() {
+                const text = this.textContent;
+                navigator.clipboard.writeText(text);
+                const original = this.textContent;
+                this.textContent = '✓ Copié !';
+                setTimeout(() => {
+                    this.textContent = original;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
